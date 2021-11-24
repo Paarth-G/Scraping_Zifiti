@@ -1,0 +1,98 @@
+buildscript {    // Configuration for building
+	repositories {
+		jcenter()    // Bintray's repository - a fast Maven Central mirror & more
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'com.google.cloud.tools:appengine-gradle-plugin:2.2.0' // If a newer version is available, use it
+	}
+}
+
+plugins {
+	id 'org.springframework.boot' version '2.4.2'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+
+// gcloud app create --region europe-west3
+
+
+
+
+repositories {   // repositories for Jar's you access in your code
+	maven {
+		url 'https://oss.sonatype.org/content/repositories/snapshots' // SNAPSHOT repository (if needed)
+	}
+	mavenCentral()
+	jcenter()
+}
+
+apply plugin: 'com.google.cloud.tools.appengine'
+
+group = 'com.scrapping'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+	jcenter()
+}
+
+ext {
+	set('testcontainersVersion', "1.15.1")
+}
+
+compileJava.dependsOn(processResources)
+compileJava.inputs.files(processResources)
+
+dependencies {
+	compile 'com.google.appengine:appengine-api-1.0-sdk:+'  // Latest App Engine Api's
+	compile 'javax.servlet:javax.servlet-api:3.1.0'
+
+	compile 'jstl:jstl:1.2'
+
+
+	compile 'org.jsoup:jsoup:1.13.1'
+
+	compile "org.springframework.boot:spring-boot-configuration-processor"
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'mysql:mysql-connector-java'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.testcontainers:mysql'
+}
+
+
+
+appengine {
+	deploy {   // deploy configuration
+		stopPreviousVersion = true  // default - stop the current version
+		promote = true              // default - & make this the current version
+	}
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
+	}
+}
+
+test {
+	useJUnitPlatform()
+}
